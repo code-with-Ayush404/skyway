@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-cream: #FAF8F3;
+  --color-bg-white: #FFFFFF;
+  --color-primary-teal: #1B4D5A;
+  --color-primary-teal-dk: #133842;
+  --color-accent-gold: #C9A227;
+  --color-accent-gold-lt: #E6C75A;
+  --color-text-dark: #1A1A1A;
+  --color-text-muted: #6B6B6B;
+  --color-border-soft: #E8E4DC;
+  --color-success-green: #2E8B57;
+  --color-footer-dark: #0F1F24;
+
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-inter), sans-serif;
+
+  --radius-card: 16px;
+  --radius-btn: 8px;
+}
+
+body {
+  background-color: var(--color-bg-cream);
+  color: var(--color-text-dark);
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), serif;
+  color: var(--color-primary-teal);
+}
+
+.italic-accent {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  color: var(--color-accent-gold);
+}
+
+.small-caps-label {
+  font-family: var(--font-inter), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-accent-gold);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-soft);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-gold);
+}
+
+/* Page transitions */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Swiper pagination dots matching gold/white tokens */
+.hero-custom-pagination {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero-bullet:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-bullet-active {
+  background-color: #C9A227 !important; /* accent-gold */
+  width: 24px !important;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+}
