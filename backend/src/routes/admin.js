@@ -22,14 +22,52 @@ const router = express.Router();
 // Create new tour package (Admin only)
 router.post("/tours", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const tour = await createTour(req.body);
+    const body = req.body;
+
+    const slug =
+      body.slug ||
+      body.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-");
+
+    const payload = {
+      ...body,
+
+      id: `tour-${Date.now()}`,
+      slug,
+
+      title: body.title,
+      location: body.location,
+      category: body.category || "Domestic",
+      groupSize: body.groupSize || "2-6 People",
+      image: body.image,
+
+      originalPrice: Number(body.originalPrice || body.currentPrice),
+      currentPrice: Number(body.currentPrice),
+      days: Number(body.days || 1),
+      nights: Number(body.nights || 0),
+
+      rating: Number(body.rating || 5),
+      ratingCount: Number(body.ratingCount || 0),
+
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      inclusions: Array.isArray(body.inclusions) ? body.inclusions : [],
+      exclusions: Array.isArray(body.exclusions) ? body.exclusions : [],
+      dayWisePlan: Array.isArray(body.dayWisePlan) ? body.dayWisePlan : [],
+      gallery: Array.isArray(body.gallery) ? body.gallery : [],
+      isFeatured: Boolean(body.isFeatured || false),
+    };
+
+    const tour = await createTour(payload);
+
     return res.status(201).json({
       message: "Tour package created successfully",
-      tour
+      tour,
     });
   } catch (error) {
     console.error("POST /admin/tours error:", error);
-    return res.status(500).json({ error: "Failed to create tour package" });
+    return res.status(500).json({
+      error: "Failed to create tour package",
+      details: error.message,
+    });
   }
 });
 

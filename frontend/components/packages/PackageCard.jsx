@@ -105,13 +105,13 @@ export default function PackageCard({ pkg }) {
           </div>
           <div className="flex items-center gap-1">
             <Users className="h-3.5 w-3.5 text-accent-gold" />
-            <span>{pkg.groupSize}</span>
+            <span>{pkg.groupSize || "N/A"}</span>
           </div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5">
-          {pkg.tags.slice(0, 3).map((tag, idx) => (
+          {(pkg.tags || []).slice(0, 3).map((tag, idx) => (
             <span
               key={idx}
               className="text-[10px] font-medium text-text-muted bg-bg-cream px-2 py-0.5 rounded-full border border-border-soft"
@@ -119,9 +119,9 @@ export default function PackageCard({ pkg }) {
               {tag}
             </span>
           ))}
-          {pkg.tags.length > 3 && (
+          {(pkg.tags || []).length > 3 && (
             <span className="text-[10px] font-bold text-accent-gold bg-bg-cream px-2 py-0.5 rounded-full border border-border-soft">
-              +{pkg.tags.length - 3}
+              +{(pkg.tags || []).length - 3}
             </span>
           )}
         </div>

@@ -84,3 +84,17 @@ export async function getVehiclesByType(vehicleType) {
     throw err;
   }
 }
+export async function getAllVehicles() {
+  await connectDB();
+
+  if (isDbOffline()) {
+    return [];
+  }
+
+  try {
+    return await Vehicle.find({}).sort({ createdAt: -1 });
+  } catch (err) {
+    console.error("Error fetching vehicles:", err);
+    throw err;
+  }
+}

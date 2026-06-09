@@ -1,29 +1,44 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { getPackageBySlug, getPackages } from "@/lib/dataService";
 import PackageDetailsClient from "@/components/packages/PackageDetailsClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function PackageDetailsPage({ params }) {
-  const { slug } = await params;
-  const pkg = await getPackageBySlug(slug);
+const backendUrl =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
-  if (!pkg) {
+export default async function PackageDetailsPage({ params }) {
+  const { slug } = params;
+
+  const packageRes = await fetch(`${backendUrl}/api/packages/${slug}`, {
+    cache: "no-store",
+  });
+
+  if (!packageRes.ok) {
     notFound();
   }
 
-  // Fetch related packages: same category, excluding current package
-  const allPackages = await getPackages();
+  const pkg = await packageRes.json();
+
+  const packagesRes = await fetch(`${backendUrl}/api/packages`, {
+    cache: "no-store",
+  });
+
+  const allPackages = packagesRes.ok ? await packagesRes.json() : [];
+
   const related = allPackages.filter(
-    (p) => p.category === pkg.category && p.slug !== pkg.slug,
+    (p) => p.category === pkg.category && p.slug !== pkg.slug
   );
 
-  // Fallback if no matching category, take any other packages
   const finalRelated =
     related.length > 0
-      ? related
+      ? related.slice(0, 3)
       : allPackages.filter((p) => p.slug !== pkg.slug).slice(0, 3);
 
-  return <PackageDetailsClient pkg={pkg} relatedPackages={finalRelated} />;
+  return (
+    <PackageDetailsClient
+      pkg={pkg}
+      relatedPackages={finalRelated}
+    />
+  );
 }

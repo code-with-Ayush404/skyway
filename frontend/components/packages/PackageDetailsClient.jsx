@@ -130,9 +130,15 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
   };
 
   // Get current day wise plan content
-  const activeDayPlan =
-    pkg.dayWisePlan.find((d) => d.day === selectedDay) || pkg.dayWisePlan[0];
+  const dayWisePlan = Array.isArray(pkg?.dayWisePlan) ? pkg.dayWisePlan : [];
+const inclusions = Array.isArray(pkg?.inclusions) ? pkg.inclusions : [];
+const exclusions = Array.isArray(pkg?.exclusions) ? pkg.exclusions : [];
+const gallery = Array.isArray(pkg?.gallery) ? pkg.gallery : [];
 
+const activeDayPlan =
+  dayWisePlan.find((d) => Number(d.day) === Number(selectedDay)) ||
+  dayWisePlan[0] ||
+  null;
   return (
     <div className="bg-bg-cream min-h-screen pb-24 text-left">
       {/* 1. Full-Width Hero Header */}
@@ -184,13 +190,13 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4 text-accent-gold" />
               <span>
-                {pkg.days} Days / {pkg.nights} Nights
+                {pkg.days || 0} Days / {pkg.nights || 0} Nights
               </span>
             </div>
             <span className="text-white/20 hidden md:inline">|</span>
             <div className="flex items-center gap-1">
               <Users className="h-4 w-4 text-accent-gold" />
-              <span>Group Size: {pkg.groupSize}</span>
+              <span>Group Size: {pkg.groupSize || "N/A"}</span>
             </div>
             <span className="text-white/20 hidden md:inline">|</span>
             <div className="flex items-center gap-1">
@@ -251,7 +257,7 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
                 <div className="text-left">
                   <p className="text-xs text-text-muted mb-3 font-medium">Click any day to see the photo and details</p>
                   <div className="flex flex-wrap gap-2 pb-4">
-                    {pkg.dayWisePlan.map((d) => (
+                    {dayWisePlan.map((d) => (
                       <button
                         key={d.day}
                         onClick={() => setSelectedDay(d.day)}
@@ -376,7 +382,7 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
                     Inclusions
                   </h3>
                   <ul className="flex flex-col gap-3">
-                    {pkg.inclusions.map((item, idx) => (
+                    {inclusions.map((item, idx) => (
                       <li
                         key={idx}
                         className="flex gap-3 items-start text-xs text-text-muted leading-relaxed"
@@ -397,7 +403,7 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
                     Exclusions
                   </h3>
                   <ul className="flex flex-col gap-3">
-                    {pkg.exclusions.map((item, idx) => (
+                    {exclusions.map((item, idx) => (
                       <li
                         key={idx}
                         className="flex gap-3 items-start text-xs text-text-muted leading-relaxed"
@@ -416,7 +422,7 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
             {/* Panel 3: Gallery */}
             {activeTab === "gallery" && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {pkg.gallery.map((url, idx) => (
+                {gallery.map((url, idx) => (
                   <div
                     key={idx}
                     className="relative h-44 rounded-card overflow-hidden shadow-sm hover:scale-102 transition-transform duration-200 cursor-zoom-in"
@@ -440,7 +446,7 @@ export default function PackageDetailsClient({ pkg, relatedPackages }) {
             </h3>
 
             <div className="flex flex-col gap-3">
-              {pkg.dayWisePlan.map((d, index) => (
+              {dayWisePlan.map((d, index) => (
                 <button
                   key={index}
                   onClick={() => {

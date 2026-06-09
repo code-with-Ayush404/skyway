@@ -69,3 +69,17 @@ export async function getTourById(id) {
     throw err;
   }
 }
+export async function getAllTours() {
+  await connectDB();
+
+  if (isDbOffline()) {
+    return [];
+  }
+
+  try {
+    return await Tour.find({});
+  } catch (err) {
+    console.error("Error fetching tours:", err);
+    throw err;
+  }
+}
