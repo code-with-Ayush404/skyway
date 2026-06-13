@@ -38,9 +38,13 @@ app.get("/", (req, res) => {
 // Authentication: Login endpoint (returns user + JWT token)
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
+   // console.log("LOGIN BODY:", req.body);
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required." });
   }
+
+//  console.log("EMAIL:", email);
+//  console.log("PASSWORD:", password);
 
   await connectDB();
   let user = null;

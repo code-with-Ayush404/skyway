@@ -1,5 +1,5 @@
 import { Tour } from "../models/Tour.js";
-import { Vehicle } from "../models/Vehicle.js";
+import Vehicle  from "../models/Vehicle.js";
 import { Testimonial } from "../models/Testimonial.js";
 import { Booking } from "../models/Booking.js";
 import { ContactMessage } from "../models/ContactMessage.js";

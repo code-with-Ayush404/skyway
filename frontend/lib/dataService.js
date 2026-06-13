@@ -39,20 +39,54 @@ export async function getPackageBySlug(slug) {
   }
 }
 
+// export async function getTaxiCars() {
+//   try {
+//     return await apiFetch("/api/taxi-cars");
+//   } catch (error) {
+//     console.warn("getTaxiCars failed, returning fallback mockTaxis:", error);
+//     return mockTaxis;
+//   }
+// }
+
+//updated file
 export async function getTaxiCars() {
   try {
-    return await apiFetch("/api/taxi-cars");
+    const data = await apiFetch("/api/admin/vehicles");
+
+    return (data.vehicles || []).filter(
+      (vehicle) => vehicle.vehicleType === "TAXI"
+    );
   } catch (error) {
-    console.warn("getTaxiCars failed, returning fallback mockTaxis:", error);
+    console.warn(
+      "getTaxiCars failed, returning fallback mockTaxis:",
+      error
+    );
     return mockTaxis;
   }
 }
 
+// export async function getWeddingCars() {
+//   try {
+//     return await apiFetch("/api/wedding-cars");
+//   } catch (error) {
+//     console.warn("getWeddingCars failed, returning fallback mockWeddingCars:", error);
+//     return mockWeddingCars;
+//   }
+// }
+
+//updated 
 export async function getWeddingCars() {
   try {
-    return await apiFetch("/api/wedding-cars");
+    const data = await apiFetch("/api/admin/vehicles");
+
+    return (data.vehicles || []).filter(
+      (vehicle) => vehicle.vehicleType === "WEDDING"
+    );
   } catch (error) {
-    console.warn("getWeddingCars failed, returning fallback mockWeddingCars:", error);
+    console.warn(
+      "getWeddingCars failed, returning fallback mockWeddingCars:",
+      error
+    );
     return mockWeddingCars;
   }
 }

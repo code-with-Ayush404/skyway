@@ -136,83 +136,161 @@ router.delete("/tours/:id", verifyToken, verifyAdmin, async (req, res) => {
 // ===== VEHICLE MANAGEMENT (TAXI & WEDDING CARS) =====
 
 // Create new vehicle (Admin only)
+// router.post("/vehicles", verifyToken, verifyAdmin, async (req, res) => {
+//   try {
+//     const vehicle = await createVehicle(req.body);
+//     return res.status(201).json({
+//       message: "Vehicle added successfully",
+//       vehicle
+//     });
+//   } catch (error) {
+//     console.error("POST /admin/vehicles error:", error);
+//     return res.status(500).json({ error: "Failed to add vehicle" });
+//   }
+// });
+
+// // Get all vehicles (Admin only)
+// router.get("/vehicles", verifyToken, verifyAdmin, async (req, res) => {
+//   try {
+//     const vehicles = await getAllVehicles();
+//     const taxis = vehicles.filter(v => v.vehicleType === "TAXI");
+//     const weddingCars = vehicles.filter(v => v.vehicleType === "WEDDING");
+    
+//     return res.json({
+//       total: vehicles.length,
+//       taxis: taxis.length,
+//       weddingCars: weddingCars.length,
+//       vehicles
+//     });
+//   } catch (error) {
+//     console.error("GET /admin/vehicles error:", error);
+//     return res.status(500).json({ error: "Failed to fetch vehicles" });
+//   }
+// });
+
+// // Get single vehicle (Admin only)
+// router.get("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
+//   try {
+//     const vehicle = await getVehicleById(req.params.id);
+//     if (!vehicle) {
+//       return res.status(404).json({ error: "Vehicle not found" });
+//     }
+//     return res.json(vehicle);
+//   } catch (error) {
+//     console.error("GET /admin/vehicles/:id error:", error);
+//     return res.status(500).json({ error: "Failed to fetch vehicle" });
+//   }
+// });
+
+// // Update vehicle (Admin only)
+// router.put("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
+//   try {
+//     const vehicle = await updateVehicle(req.params.id, req.body);
+//     if (!vehicle) {
+//       return res.status(404).json({ error: "Vehicle not found" });
+//     }
+//     return res.json({
+//       message: "Vehicle updated successfully",
+//       vehicle
+//     });
+//   } catch (error) {
+//     console.error("PUT /admin/vehicles/:id error:", error);
+//     return res.status(500).json({ error: "Failed to update vehicle" });
+//   }
+// });
+
+// // Delete vehicle (Admin only)
+// router.delete("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
+//   try {
+//     const vehicle = await deleteVehicle(req.params.id);
+//     if (!vehicle) {
+//       return res.status(404).json({ error: "Vehicle not found" });
+//     }
+//     return res.json({
+//       message: "Vehicle deleted successfully",
+//       deletedVehicle: vehicle
+//     });
+//   } catch (error) {
+//     console.error("DELETE /admin/vehicles/:id error:", error);
+//     return res.status(500).json({ error: "Failed to delete vehicle" });
+//   }
+// });
+
+// ===== VEHICLE MANAGEMENT =====
+
 router.post("/vehicles", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const vehicle = await createVehicle(req.body);
+
     return res.status(201).json({
       message: "Vehicle added successfully",
-      vehicle
+      vehicle,
     });
   } catch (error) {
     console.error("POST /admin/vehicles error:", error);
-    return res.status(500).json({ error: "Failed to add vehicle" });
+    return res.status(500).json({
+      error: "Failed to add vehicle",
+      details: error.message,
+    });
   }
 });
 
-// Get all vehicles (Admin only)
-router.get("/vehicles", verifyToken, verifyAdmin, async (req, res) => {
+router.get("/vehicles", async (req, res) => {
   try {
     const vehicles = await getAllVehicles();
-    const taxis = vehicles.filter(v => v.vehicleType === "TAXI");
-    const weddingCars = vehicles.filter(v => v.vehicleType === "WEDDING");
-    
+
     return res.json({
       total: vehicles.length,
-      taxis: taxis.length,
-      weddingCars: weddingCars.length,
-      vehicles
+      vehicles,
     });
   } catch (error) {
     console.error("GET /admin/vehicles error:", error);
-    return res.status(500).json({ error: "Failed to fetch vehicles" });
-  }
-});
-
-// Get single vehicle (Admin only)
-router.get("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const vehicle = await getVehicleById(req.params.id);
-    if (!vehicle) {
-      return res.status(404).json({ error: "Vehicle not found" });
-    }
-    return res.json(vehicle);
-  } catch (error) {
-    console.error("GET /admin/vehicles/:id error:", error);
-    return res.status(500).json({ error: "Failed to fetch vehicle" });
-  }
-});
-
-// Update vehicle (Admin only)
-router.put("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const vehicle = await updateVehicle(req.params.id, req.body);
-    if (!vehicle) {
-      return res.status(404).json({ error: "Vehicle not found" });
-    }
-    return res.json({
-      message: "Vehicle updated successfully",
-      vehicle
+    return res.status(500).json({
+      error: "Failed to fetch vehicles",
+      details: error.message,
     });
-  } catch (error) {
-    console.error("PUT /admin/vehicles/:id error:", error);
-    return res.status(500).json({ error: "Failed to update vehicle" });
   }
 });
 
-// Delete vehicle (Admin only)
 router.delete("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const vehicle = await deleteVehicle(req.params.id);
+
     if (!vehicle) {
       return res.status(404).json({ error: "Vehicle not found" });
     }
+
     return res.json({
       message: "Vehicle deleted successfully",
-      deletedVehicle: vehicle
+      deletedVehicle: vehicle,
     });
   } catch (error) {
     console.error("DELETE /admin/vehicles/:id error:", error);
-    return res.status(500).json({ error: "Failed to delete vehicle" });
+    return res.status(500).json({
+      error: "Failed to delete vehicle",
+      details: error.message,
+    });
+  }
+});
+
+router.put("/vehicles/:id", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const vehicle = await updateVehicle(req.params.id, req.body);
+
+    if (!vehicle) {
+      return res.status(404).json({ error: "Vehicle not found" });
+    }
+
+    return res.json({
+      message: "Vehicle updated successfully",
+      vehicle,
+    });
+  } catch (error) {
+    console.error("PUT /admin/vehicles/:id error:", error);
+    return res.status(500).json({
+      error: "Failed to update vehicle",
+      details: error.message,
+    });
   }
 });
 
