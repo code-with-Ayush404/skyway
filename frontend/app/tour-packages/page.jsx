@@ -123,8 +123,8 @@ function TourPackagesContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-3 bg-white border border-border-soft rounded-card shadow-sm p-6 flex flex-col gap-6 text-left h-fit">
+  <div className="max-w-7xl mx-auto px-6 mt-12">
+        {/* <div className="lg:col-span-3 bg-white border border-border-soft rounded-card shadow-sm p-6 flex flex-col gap-6 text-left h-fit">
           <div className="flex items-center justify-between border-b border-border-soft pb-4">
             <span className="font-serif text-lg font-bold text-primary-teal flex items-center gap-2">
               <SlidersHorizontal className="h-4 w-4 text-accent-gold" />
@@ -206,9 +206,9 @@ function TourPackagesContent() {
               <option value="Rating">Rating: Highest First</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
-        <div className="lg:col-span-9 flex flex-col gap-6 text-left">
+      <div className="flex flex-col gap-6 text-left">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap gap-1.5">
               {categories.map((cat) => (
@@ -226,15 +226,22 @@ function TourPackagesContent() {
               ))}
             </div>
 
-            <div className="text-xs text-text-muted">
-              {!isLoading && (
-                <span>
-                  Showing{" "}
-                  <strong className="text-text-dark">{packages.length}</strong>{" "}
-                  packages found
-                </span>
-              )}
-            </div>
+       <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search destination..."
+    className="w-full pl-4 pr-10 py-2.5 bg-white border border-border-soft rounded-full text-sm text-text-dark focus:outline-none focus:border-accent-gold"
+  />
+
+  <button
+    type="submit"
+    className="absolute right-3 top-2.5 text-text-muted hover:text-primary-teal"
+  >
+    <Search className="h-5 w-5" />
+  </button>
+</form>
           </div>
 
           {isLoading ? (

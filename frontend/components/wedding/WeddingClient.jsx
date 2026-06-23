@@ -495,11 +495,11 @@ export default function WeddingClient({ initialCars = [] }) {
     }
   };
 
-  const getWhatsAppLink = (carName, price) => {
+  const getWhatsAppLink = (carName) => {
     const text =
       `Hi Skyway Travel, I would like to book the wedding rental car:\n\n` +
       `Car: ${carName}\n` +
-      `Price: ${price}\n` +
+      
       `Please let me know availability for my upcoming wedding.`;
 
     return `https://wa.me/919876543210?text=${encodeURIComponent(text)}`;
@@ -671,7 +671,7 @@ export default function WeddingClient({ initialCars = [] }) {
 
                   <div className="h-[1px] bg-gray-300 mb-5" />
 
-                  <table className="w-full border border-gray-200 text-sm text-gray-600">
+                  {/* <table className="w-full border border-gray-200 text-sm text-gray-600">
                     <tbody>
                       <tr>
                         <td className="border border-gray-200 p-3">Price</td>
@@ -716,11 +716,14 @@ export default function WeddingClient({ initialCars = [] }) {
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table> */}
+                  <p className="text-sm text-gray-600 leading-relaxed border border-gray-200 rounded-lg p-4 bg-gray-50">
+  Price will be determined based on the event date and requirements.
+</p>
 
                   <div className="flex justify-center mt-8">
                     <a
-                      href={getWhatsAppLink(car.name, car.pricePerKm)}
+                      href={getWhatsAppLink(car.name)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-primary-teal text-white px-8 py-3 rounded-btn text-sm font-semibold flex items-center gap-2"

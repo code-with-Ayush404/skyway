@@ -211,6 +211,39 @@ const activeDayPlan =
       <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Side: Tabs Content & Itinerary details */}
         <div className="lg:col-span-8 flex flex-col gap-8">
+          {(pkg.tripSummary || pkg.highlights?.length > 0) && (
+  <div className="bg-white border border-border-soft rounded-card shadow-sm p-6 md:p-8">
+    {pkg.tripSummary && (
+      <div className="mb-6">
+        <h2 className="font-serif text-2xl font-bold text-primary-teal mb-3">
+          Trip Summary
+        </h2>
+        <p className="text-text-muted leading-relaxed text-sm md:text-base">
+          {pkg.tripSummary}
+        </p>
+      </div>
+    )}
+
+    {pkg.highlights?.length > 0 && (
+      <div>
+        <h3 className="font-serif text-xl font-bold text-primary-teal mb-4">
+          Highlights
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {pkg.highlights.map((item, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <Check className="h-5 w-5 text-accent-gold shrink-0 mt-0.5" />
+              <span className="text-sm text-text-muted leading-relaxed">
+                {item}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
           {/* Tabs Navigation Header */}
           <div className="flex border-b border-border-soft bg-white p-2 rounded-card shadow-sm gap-2">
             <button
@@ -301,15 +334,46 @@ const activeDayPlan =
                     </div>
 
                     {/* Day Plan Content Info */}
-                    <div className="px-6 pb-6 flex flex-col gap-6">
-                      <p className="text-xs md:text-sm text-text-muted leading-relaxed text-left font-light">
-                        {activeDayPlan.description}
-                      </p>
+                 <div className="px-6 pb-6">
+  <div className="space-y-5">
+    {(Array.isArray(activeDayPlan.description)
+      ? activeDayPlan.description
+      : String(activeDayPlan.description || "")
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+    ).map((point, index) => (
+      <div key={index} className="flex items-start gap-4">
+        <div className="flex-shrink-0 mt-1">
+          <div className="w-8 h-8 rounded-full border-2 border-sky-500 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-sky-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+          {point}
+        </p>
+      </div>
+    ))}
+  </div>
 
                       {/* Side-by-side details */}
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                      {/* <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                         {/* Left Side: Activities List */}
-                        <div className="md:col-span-7 flex flex-col gap-3.5 text-left">
+                        {/* <div className="md:col-span-7 flex flex-col gap-3.5 text-left">
                           <button className="flex items-center gap-2 font-bold text-xs uppercase tracking-widest text-text-dark hover:text-accent-gold w-fit transition-colors">
                             <span className="w-5 h-5 rounded-full bg-border-soft flex items-center justify-center text-[10px] font-bold text-text-muted font-sans shrink-0">
                               &gt;
@@ -331,10 +395,10 @@ const activeDayPlan =
                           ) : (
                             <p className="text-xs text-text-muted italic pl-2">Leisure time or custom activity.</p>
                           )}
-                        </div>
+                        </div> */}
 
                         {/* Right Side: Meals Included */}
-                        <div className="md:col-span-5 bg-[#FAF8F3] border border-border-soft rounded-card p-4 flex flex-col gap-2 text-left">
+                        {/* <div className="md:col-span-5 bg-[#FAF8F3] border border-border-soft rounded-card p-4 flex flex-col gap-2 text-left">
                           <span className="text-xs font-bold text-[#8A631E] flex items-center gap-1.5 font-serif">
                             🍴 Meals Included
                           </span>
@@ -342,7 +406,7 @@ const activeDayPlan =
                             {activeDayPlan.meals || "Breakfast & Dinner"}
                           </span>
                         </div>
-                      </div>
+                      </div> */} 
 
                       {/* Inside Card Footer Navigation */}
                       <div className="flex justify-between items-center border-t border-border-soft pt-4 mt-2">
@@ -487,13 +551,33 @@ const activeDayPlan =
               ))}
             </div>
           </div>
+          {/* Location Map */}
+<div className="flex flex-col gap-4 mt-10">
+  <h3 className="font-serif text-2xl font-bold text-primary-teal text-left">
+    Location
+  </h3>
+
+  <div className="w-full h-[450px] rounded-card overflow-hidden border border-border-soft shadow-sm">
+    <iframe
+      src={`https://www.google.com/maps?q=${encodeURIComponent(
+        pkg.mapLocation || pkg.location
+      )}&output=embed`}
+      width="100%"
+      height="100%"
+      style={{ border: 0 }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+    />
+  </div>
+</div>
         </div>
 
         {/* Right Side: Sticky Booking Sidebar */}
         <div className="lg:col-span-4 lg:sticky lg:top-[100px] flex flex-col gap-6">
           {/* Price & Book Card */}
           <div className="bg-white border border-border-soft rounded-card shadow-lg p-6 flex flex-col gap-5 text-left">
-            <div>
+            {/* <div>
               <span className="text-[10px] uppercase tracking-wider text-text-muted font-semibold">
                 Starting from
               </span>
@@ -508,7 +592,7 @@ const activeDayPlan =
                   </span>
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Quick Contact buttons */}
             <div className="grid grid-cols-2 gap-3">

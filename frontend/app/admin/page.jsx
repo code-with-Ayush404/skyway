@@ -608,14 +608,17 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const emptyTour = {
   title: "",
+  tripSummary: "",
+highlightsText: "",
   location: "",
   category: "",
   badge: "",
-  discount: "",
+  mapLocation: "",
+ // discount: "",
   rating: 5,
   ratingCount: 0,
-  originalPrice: "",
-  currentPrice: "",
+ // originalPrice: "",
+  //currentPrice: "",
   days: "",
   nights: "",
   groupSize: "",
@@ -651,6 +654,20 @@ const splitText = (value = "") =>
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+
+const uploadImage = async (file, token) => {
+  const data = new FormData();
+  data.append("image", file);
+
+  const res = await axios.post(`${API_URL}/admin/upload`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data.imageUrl;
+};    
 
 export default function AdminPage() {
   const router = useRouter();
@@ -735,6 +752,9 @@ export default function AdminPage() {
           ? item.exclusions.join(", ")
           : "",
         galleryText: Array.isArray(item.gallery) ? item.gallery.join(", ") : "",
+        highlightsText: Array.isArray(item.highlights)
+  ? item.highlights.join(", ")
+  : "",
         dayWisePlan: Array.isArray(item.dayWisePlan) ? item.dayWisePlan : [],
       });
     } else {
@@ -747,25 +767,22 @@ export default function AdminPage() {
     setShowForm(true);
   };
 
-  const addDayPlan = () => {
-    const nextDay = (formData.dayWisePlan?.length || 0) + 1;
+const addDayPlan = () => {
+  const nextDay = (formData.dayWisePlan?.length || 0) + 1;
 
-    setFormData({
-      ...formData,
-      dayWisePlan: [
-        ...(formData.dayWisePlan || []),
-        {
-          day: nextDay,
-          title: "",
-          description: "",
-          activitiesText: "",
-          activities: [],
-          meals: "",
-          image: "",
-        },
-      ],
-    });
-  };
+  setFormData({
+    ...formData,
+    dayWisePlan: [
+      ...(formData.dayWisePlan || []),
+      {
+        day: nextDay,
+        title: "",
+        descriptionText: "",
+        image: "",
+      },
+    ],
+  });
+};
 
   const updateDayPlan = (index, field, value) => {
     const updated = [...(formData.dayWisePlan || [])];
@@ -800,16 +817,19 @@ export default function AdminPage() {
           id: formData.id || `tour-${Date.now()}`,
           slug: formData.slug || makeSlug(formData.title),
           title: formData.title,
-          location: formData.location,
-          category: formData.category,
+          tripSummary: formData.tripSummary,
+highlights: splitText(formData.highlightsText),
+      location: formData.location,
+mapLocation: formData.mapLocation || formData.location,
+category: formData.category,
           badge: formData.badge || null,
-          discount: formData.discount || null,
+//          discount: formData.discount || null,
           rating: Number(formData.rating || 5),
           ratingCount: Number(formData.ratingCount || 0),
-          originalPrice: Number(
-            formData.originalPrice || formData.currentPrice || 0,
-          ),
-          currentPrice: Number(formData.currentPrice || 0),
+          // originalPrice: Number(
+          //   formData.originalPrice || formData.currentPrice || 0,
+          // ),
+     //     currentPrice: Number(formData.currentPrice || 0),
           days: Number(formData.days || 1),
           nights: Number(formData.nights || 0),
           groupSize: formData.groupSize,
@@ -819,16 +839,14 @@ export default function AdminPage() {
           image: formData.image,
           gallery: splitText(formData.galleryText),
           isFeatured: Boolean(formData.isFeatured),
-          dayWisePlan: (formData.dayWisePlan || []).map((day, index) => ({
-            day: Number(day.day || index + 1),
-            title: day.title,
-            description: day.description,
-            activities: Array.isArray(day.activities)
-              ? day.activities
-              : splitText(day.activitiesText || ""),
-            meals: day.meals,
-            image: day.image || null,
-          })),
+        dayWisePlan: (formData.dayWisePlan || []).map((day, index) => ({
+  day: Number(day.day || index + 1),
+  title: day.title,
+  description: Array.isArray(day.description)
+    ? day.description
+    : splitText(day.descriptionText || ""),
+  image: day.image || null,
+})),
         };
 
         if (editingId) {
@@ -843,13 +861,32 @@ export default function AdminPage() {
       } else {
         const payload = {
           name: formData.name,
-          vehicleType: formData.vehicleType || "TAXI",
+    vehicleType: activeTab === "wedding" ? "WEDDING" : "TAXI",
           image: formData.image,
-          pricePerKm: formData.pricePerKm,
-          extraKmPrice: formData.extraKmPrice,
-          extraHours: formData.extraHours,
-          nightCharge: formData.nightCharge,
-          outStation: formData.outStation,
+      pricePerKm:
+  activeTab === "wedding"
+    ? "Price on Request"
+    : formData.pricePerKm,
+
+extraKmPrice:
+  activeTab === "wedding"
+    ? "-"
+    : formData.extraKmPrice,
+
+extraHours:
+  activeTab === "wedding"
+    ? "-"
+    : formData.extraHours,
+
+nightCharge:
+  activeTab === "wedding"
+    ? "-"
+    : formData.nightCharge,
+
+outStation:
+  activeTab === "wedding"
+    ? "Price will be determined based on the event date and requirements."
+    : formData.outStation,
         };
 
         if (editingId) {
@@ -904,7 +941,7 @@ export default function AdminPage() {
       <header className="bg-linear-to-r from-blue-900 to-blue-700 text-white p-6 shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Skyway Travel Admin Panel</h1>
+            <h1 className="text-3xl font-bold"   style={{ color: "#ffffff" }}>Skyway Travel Admin Panel</h1>
             <p className="text-blue-100">Manage Tour Packages & Vehicles</p>
           </div>
 
@@ -951,6 +988,21 @@ export default function AdminPage() {
           >
             Vehicles
           </button>
+          <button
+  onClick={() => {
+    setActiveTab("wedding");
+    setShowForm(false);
+    setFormData(emptyVehicle);
+    setEditingId(null);
+  }}
+  className={`px-6 py-3 rounded-lg font-semibold ${
+    activeTab === "wedding"
+      ? "bg-blue-600 text-white"
+      : "bg-white text-gray-700 border"
+  }`}
+>
+  Wedding
+</button>
         </div>
 
         {!showForm && (
@@ -963,8 +1015,9 @@ export default function AdminPage() {
             className="mb-6 flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg"
           >
             <Plus size={20} />
-            Add New {activeTab === "tours" ? "Tour Package" : "Vehicle"}
+Add New {activeTab === "tours" ? "Tour Package" : activeTab === "wedding" ? "Wedding Car" : "Vehicle"}
           </button>
+          
         )}
 
         {showForm && (
@@ -984,6 +1037,24 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded"
                 />
+                <textarea
+  placeholder="Trip Summary"
+  value={formData.tripSummary || ""}
+  onChange={(e) =>
+    setFormData({ ...formData, tripSummary: e.target.value })
+  }
+  className="border p-2 rounded md:col-span-2"
+  rows={3}
+/>
+
+<input
+  placeholder="Highlights comma separated"
+  value={formData.highlightsText || ""}
+  onChange={(e) =>
+    setFormData({ ...formData, highlightsText: e.target.value })
+  }
+  className="border p-2 rounded md:col-span-2"
+/>
                 <input
                   required
                   placeholder="Location"
@@ -993,6 +1064,14 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded"
                 />
+                <input
+  placeholder="Map Location e.g. Kathmandu, Nepal"
+  value={formData.mapLocation || ""}
+  onChange={(e) =>
+    setFormData({ ...formData, mapLocation: e.target.value })
+  }
+  className="border p-2 rounded"
+/>
                 <input
                   required
                   placeholder="Category"
@@ -1010,14 +1089,14 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded"
                 />
-                <input
+                {/* <input
                   placeholder="Discount e.g. 20% OFF"
                   value={formData.discount || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, discount: e.target.value })
                   }
                   className="border p-2 rounded"
-                />
+                /> */}
                 <input
                   type="number"
                   step="0.1"
@@ -1037,7 +1116,7 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded"
                 />
-                <input
+                {/* <input
                   required
                   type="number"
                   placeholder="Original Price"
@@ -1046,8 +1125,8 @@ export default function AdminPage() {
                     setFormData({ ...formData, originalPrice: e.target.value })
                   }
                   className="border p-2 rounded"
-                />
-                <input
+                /> */}
+                {/* <input
                   required
                   type="number"
                   placeholder="Current Price"
@@ -1056,7 +1135,7 @@ export default function AdminPage() {
                     setFormData({ ...formData, currentPrice: e.target.value })
                   }
                   className="border p-2 rounded"
-                />
+                /> */}
                 <input
                   required
                   type="number"
@@ -1086,7 +1165,7 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded"
                 />
-                <input
+                {/* <input
                   required
                   placeholder="Main Image URL"
                   value={formData.image || ""}
@@ -1094,7 +1173,46 @@ export default function AdminPage() {
                     setFormData({ ...formData, image: e.target.value })
                   }
                   className="border p-2 rounded"
-                />
+                /> */}
+
+                <div className="border rounded p-3 flex flex-col gap-2">
+  <input
+    required
+    placeholder="Main Image URL"
+    value={formData.image || ""}
+    onChange={(e) =>
+      setFormData({ ...formData, image: e.target.value })
+    }
+    className="border p-2 rounded"
+  />
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        toast.loading("Uploading main image...");
+        const imageUrl = await uploadImage(file, token);
+        setFormData({ ...formData, image: imageUrl });
+        toast.success("Main image uploaded");
+      } catch (error) {
+        toast.error("Image upload failed");
+      }
+    }}
+    className="border p-2 rounded text-sm"
+  />
+
+  {formData.image && (
+    <img
+      src={formData.image}
+      alt="Main preview"
+      className="h-24 w-32 object-cover rounded border"
+    />
+  )}
+</div>
                 <input
                   placeholder="Tags comma separated"
                   value={formData.tagsText || ""}
@@ -1119,14 +1237,182 @@ export default function AdminPage() {
                   }
                   className="border p-2 rounded md:col-span-2"
                 />
-                <input
+                {/* <input
                   placeholder="Gallery image URLs comma separated"
                   value={formData.galleryText || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, galleryText: e.target.value })
                   }
                   className="border p-2 rounded md:col-span-2"
-                />
+                /> */}
+                <div className="md:col-span-2 border rounded p-3 flex flex-col gap-3">
+  <input
+    placeholder="Gallery image URLs comma separated"
+    value={formData.galleryText || ""}
+    onChange={(e) =>
+      setFormData({ ...formData, galleryText: e.target.value })
+    }
+    className="border p-2 rounded"
+  />
+
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      try {
+        toast.loading("Uploading gallery images...");
+
+        const uploadedUrls = [];
+        for (const file of files) {
+          const imageUrl = await uploadImage(file, token);
+          uploadedUrls.push(imageUrl);
+        }
+
+        const oldUrls = formData.galleryText
+          ? formData.galleryText.split(",").map((item) => item.trim()).filter(Boolean)
+          : [];
+
+        setFormData({
+          ...formData,
+          galleryText: [...oldUrls, ...uploadedUrls].join(", "),
+        });
+
+        toast.success("Gallery images uploaded");
+      } catch (error) {
+        toast.error("Gallery upload failed");
+      }
+    }}
+    className="border p-2 rounded text-sm"
+  />
+
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    {(formData.galleryText || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((url, index) => (
+        <div key={index} className="relative">
+          <img
+            src={url}
+            alt={`Gallery ${index + 1}`}
+            className="h-24 w-full object-cover rounded border"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const updated = (formData.galleryText || "")
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean)
+                .filter((_, i) => i !== index);
+
+              setFormData({
+                ...formData,
+                galleryText: updated.join(", "),
+              });
+            }}
+            className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
+          >
+            X
+          </button>
+        </div>
+      ))}
+  </div>
+</div>
+{/* YAHAN DAY WISE PLAN  HAI */}
+<div className="md:col-span-2 border rounded-lg p-4 bg-gray-50">
+  <div className="flex justify-between items-center mb-4">
+    <h3 className="font-bold text-lg">Day Wise Plan</h3>
+    <button
+      type="button"
+      onClick={addDayPlan}
+      className="bg-green-600 text-white px-3 py-2 rounded"
+    >
+      Add Day
+    </button>
+  </div>
+
+  {(formData.dayWisePlan || []).map((day, index) => (
+    <div
+      key={index}
+      className="border bg-white rounded-lg p-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-3"
+    >
+      <input
+        type="number"
+        placeholder="Day Number"
+        value={day.day || ""}
+        onChange={(e) => updateDayPlan(index, "day", e.target.value)}
+        className="border p-2 rounded"
+      />
+
+      <input
+        placeholder="Day Title"
+        value={day.title || ""}
+        onChange={(e) => updateDayPlan(index, "title", e.target.value)}
+        className="border p-2 rounded"
+      />
+
+      <textarea
+        placeholder="Day description points comma separated"
+        value={
+          day.descriptionText ||
+          (Array.isArray(day.description) ? day.description.join(", ") : "")
+        }
+        onChange={(e) =>
+          updateDayPlan(index, "descriptionText", e.target.value)
+        }
+        className="border p-2 rounded md:col-span-2"
+        rows={4}
+      />
+
+      <input
+        placeholder="Day Image URL"
+        value={day.image || ""}
+        onChange={(e) => updateDayPlan(index, "image", e.target.value)}
+        className="border p-2 rounded md:col-span-2"
+      />
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+
+          try {
+            toast.loading("Uploading day image...");
+            const imageUrl = await uploadImage(file, token);
+            updateDayPlan(index, "image", imageUrl);
+            toast.success("Day image uploaded");
+          } catch (error) {
+            toast.error("Day image upload failed");
+          }
+        }}
+        className="border p-2 rounded md:col-span-2 text-sm"
+      />
+
+      {day.image && (
+        <img
+          src={day.image}
+          alt={`Day ${day.day}`}
+          className="h-24 w-36 object-cover rounded border"
+        />
+      )}
+
+      <button
+        type="button"
+        onClick={() => removeDayPlan(index)}
+        className="bg-red-500 text-white px-3 py-2 rounded md:col-span-2"
+      >
+        Remove Day
+      </button>
+    </div>
+  ))}
+</div>
               </>
             ) : (
               <>
@@ -1140,7 +1426,7 @@ export default function AdminPage() {
                   className="border p-2 rounded"
                 />
 
-                <select
+                {/* <select
                   value={formData.vehicleType || "TAXI"}
                   onChange={(e) =>
                     setFormData({ ...formData, vehicleType: e.target.value })
@@ -1149,67 +1435,105 @@ export default function AdminPage() {
                 >
                   <option value="TAXI">Taxi</option>
                   <option value="WEDDING">Wedding</option>
-                </select>
-
+                </select> */}
                 <input
-                  required
-                  placeholder="Image URL"
-                  value={formData.image || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+  value={activeTab === "wedding" ? "Wedding Car" : "Taxi Vehicle"}
+  readOnly
+  className="border p-2 rounded bg-gray-100"
+/>
 
-                <input
-                  required
-                  placeholder="Price e.g. Rs.11/-Per km"
-                  value={formData.pricePerKm || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pricePerKm: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+               <div className="border rounded p-3 flex flex-col gap-2">
+  <input
+    required
+    placeholder="Image URL"
+    value={formData.image || ""}
+    onChange={(e) =>
+      setFormData({ ...formData, image: e.target.value })
+    }
+    className="border p-2 rounded"
+  />
 
-                <input
-                  required
-                  placeholder="Extra KM Price e.g. Rs.11/-Per km"
-                  value={formData.extraKmPrice || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, extraKmPrice: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-                <input
-                  required
-                  placeholder="Extra Hours e.g. Rs.120/-Per hour"
-                  value={formData.extraHours || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, extraHours: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+      try {
+        toast.loading("Uploading vehicle image...");
+        const imageUrl = await uploadImage(file, token);
+        setFormData({ ...formData, image: imageUrl });
+        toast.success("Image uploaded");
+      } catch (error) {
+        toast.error("Image upload failed");
+      }
+    }}
+    className="border p-2 rounded text-sm"
+  />
 
-                <input
-                  required
-                  placeholder="Night Charge e.g. Rs.300/-"
-                  value={formData.nightCharge || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, nightCharge: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+  {formData.image && (
+    <img
+      src={formData.image}
+      alt="Vehicle preview"
+      className="h-24 w-32 object-cover rounded border"
+    />
+  )}
+</div>
 
-                <input
-                  required
-                  placeholder="Out Station e.g. Rs.11/km(250/Day)"
-                  value={formData.outStation || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, outStation: e.target.value })
-                  }
-                  className="border p-2 rounded"
-                />
+{activeTab !== "wedding" && (
+  <>
+    <input
+      required
+      placeholder="Price e.g. Rs.11/-Per km"
+      value={formData.pricePerKm || ""}
+      onChange={(e) =>
+        setFormData({ ...formData, pricePerKm: e.target.value })
+      }
+      className="border p-2 rounded"
+    />
+
+    <input
+      required
+      placeholder="Extra KM Price e.g. Rs.11/-Per km"
+      value={formData.extraKmPrice || ""}
+      onChange={(e) =>
+        setFormData({ ...formData, extraKmPrice: e.target.value })
+      }
+      className="border p-2 rounded"
+    />
+
+    <input
+      required
+      placeholder="Extra Hours e.g. Rs.120/-Per hour"
+      value={formData.extraHours || ""}
+      onChange={(e) =>
+        setFormData({ ...formData, extraHours: e.target.value })
+      }
+      className="border p-2 rounded"
+    />
+
+    <input
+      required
+      placeholder="Night Charge e.g. Rs.300/-"
+      value={formData.nightCharge || ""}
+      onChange={(e) =>
+        setFormData({ ...formData, nightCharge: e.target.value })
+      }
+      className="border p-2 rounded"
+    />
+
+    <input
+      required
+      placeholder="Out Station e.g. Rs.11/km(250/Day)"
+      value={formData.outStation || ""}
+      onChange={(e) =>
+        setFormData({ ...formData, outStation: e.target.value })
+      }
+      className="border p-2 rounded"
+    />
+  </>
+)}
               </>
             )}
 
@@ -1243,11 +1567,15 @@ export default function AdminPage() {
               onDelete={handleDelete}
             />
           ) : (
-            <VehicleTable
-              vehicles={vehicles}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+              <VehicleTable
+    vehicles={vehicles.filter((v) =>
+      activeTab === "wedding"
+        ? v.vehicleType === "WEDDING"
+        : v.vehicleType === "TAXI"
+    )}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+  />
           )}
         </div>
       </main>
@@ -1263,7 +1591,7 @@ function TourTable({ tours, onEdit, onDelete }) {
           <tr>
             <th className="text-left p-4">Title</th>
             <th className="text-left p-4">Location</th>
-            <th className="text-left p-4">Price</th>
+          {/* <th className="text-left p-4">Price</th> */}
             <th className="text-left p-4">Days</th>
             <th className="text-left p-4">Actions</th>
           </tr>
@@ -1278,7 +1606,7 @@ function TourTable({ tours, onEdit, onDelete }) {
               >
                 <td className="p-4">{tour.title}</td>
                 <td className="p-4">{tour.location}</td>
-                <td className="p-4">₹{tour.currentPrice}</td>
+                {/* <td className="p-4">₹{tour.currentPrice}</td> */}
                 <td className="p-4">{tour.days}</td>
                 <td className="p-4 flex gap-2">
                   <button
@@ -1299,7 +1627,7 @@ function TourTable({ tours, onEdit, onDelete }) {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="p-4 text-center text-gray-500">
+              <td colSpan="4" className="p-4 text-center text-gray-500">
                 No tours found
               </td>
             </tr>
